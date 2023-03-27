@@ -6,9 +6,9 @@ import {
   Outlet,
   Navigate
 } from "react-router-dom";
-import LeftBar from "./componenta/leftBar/LeftBar";
-import RightBar from "./componenta/rightBar/RightBar";
-import Navbar from "./componenta/navbar/Navbar";
+import LeftBar from "./components/leftBar/LeftBar";
+import RightBar from "./components/rightBar/RightBar";
+import Navbar from "./components/navbar/Navbar";
 import Home from "./pages/home/Home"
 import Profile from "./pages/profile/Profile"
 import { useContext } from "react";
@@ -18,7 +18,6 @@ function App() {
 
   const currentUser = useContext(AuthContext);
   const { darkMode } = useContext(DarkModeContext);
-  console.log(currentUser)
   const Layout = () => {
     return (
       // eslint-disable-next-line react/jsx-filename-extension
