@@ -32,7 +32,7 @@ export const login = (req, res) => {
         if (err) return res.status(500).json(err)
         if(data.length === 0) return res.status(404).json("User not foud!");
 
-        const checkPassword = bcrypt.compareSync(req.body.password, data[0].password)
+        const checkPassword = bcrypt.compareSync(req.body.password[0], data[0].password);
         if(!checkPassword) return res.status(400).json("Wrong password or usernam!")
         const token = jwt.sign({id:data[0].id}, "secretKey");
 
