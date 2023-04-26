@@ -5,10 +5,20 @@ import authRoutes from "./routes/auth.js";
 import commentRoutes from "./routes/comments.js";
 import likeRoutes from "./routes/likes.js";
 import postRoutes from "./routes/posts.js";
+import cors from "cors";
+import cookieParser from "cookie-parser";
 
 //middlewares
-app.use(express.json())
-                 
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Credentials", true);
+  next();
+});
+app.use(express.json());
+app.use(cors({ 
+  origin:'http://localhost:3000'
+}));
+app.use(cookieParser( ));        
+   
 app.get('/', function (req, res) {
   res.send('Hello World!'); // This will serve your request to '/'.
 });
