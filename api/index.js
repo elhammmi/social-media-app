@@ -1,4 +1,4 @@
-import  express  from "express"; 
+import  express, { request }  from "express"; 
 const app = express()
 import userRoutes from "./routes/users.js";
 import authRoutes from "./routes/auth.js";
@@ -7,6 +7,7 @@ import likeRoutes from "./routes/likes.js";
 import postRoutes from "./routes/posts.js";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import multer from "multer";
 
 //middlewares
 app.use((req, res, next) => {
@@ -22,6 +23,21 @@ app.use(cookieParser( ));
 app.get('/', function (req, res) {
   res.send('Hello World!'); // This will serve your request to '/'.
 });
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, '../client/public/upload')
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + file.originalname)
+  }
+})
+
+const upload = multer({ storage: storage })
+app.post("/api/upload", upload.single("file"), (req, res)=>{
+  const file = req.file;
+  res.status(200).json(file.filename);
+})
 
 app.use("/api/users",userRoutes)
 app.use("/api/posts",postRoutes)
