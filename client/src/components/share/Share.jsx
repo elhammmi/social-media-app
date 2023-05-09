@@ -4,7 +4,7 @@ import Map from "../../assets/map.png";
 import Friend from "../../assets/friend.png";
 import { useContext, useState } from "react";
 import { AuthContext } from "../../context/authContext";
-import { useMutation,QueryClient } from 'react-query'
+import { useMutation,QueryClient } from 'react-query';
 import { makeRequest } from "../../axios";
 
 const Share = () => {
