@@ -1,45 +1,48 @@
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { AuthContext } from '../../context/authContext';
-import './comments.scss'
+import './comments.scss';
+import { useQuery, useMutation, QueryClient } from 'react-query';
+import { makeRequest } from '../../axios';
+import moment from 'moment';
+const Comments = ({ postId }) => {
 
-const Comments = () => {
+    const [desc, setDesc] = useState("");
+    const { currentUser } = useContext(AuthContext)
+    const { isLoading, error, data } = useQuery(["comments"], () =>
+        makeRequest.get('/comments?postId=' + postId).then((res) => {
+            return res.data;
+        })
+    );
+    const queryClient = new QueryClient();
 
-    const {currentUser} = useContext(AuthContext)
-    console.log(currentUser.profilePic)
-    //TEMPORARY
-
-    const comments = [
-        {
-            id: 1,
-            desc: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
-            name: "John Doe",
-            userId: 1,
-            profilePic: "https://images.pexels.com/photos/4972601/pexels-photo-4972601.jpeg?auto=compress&cs=tinysrgb&w=1600"
+    const mutation = useMutation((newComment) => {
+        return makeRequest.post("/comments", newComment);
+    }, {
+        onSuccess: () => {
+            // Invalidate and refetch
+            queryClient.invalidateQueries(['comments'])
         },
-        {
-            id: 2,
-            desc: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
-            name: "John Doe",
-            userId: 2,
-            profilePic: "https://images.pexels.com/photos/4972601/pexels-photo-4972601.jpeg?auto=compress&cs=tinysrgb&w=1600"
-        },
-
-    ];
+    })
+    const handleClick = async (e) => {
+        e.preventDefault();
+        mutation.mutate({ desc, postId });
+        setDesc("");
+    }
     return (
         <div className="comments">
             <div className="write">
                 <img src={currentUser.profilePic} alt="" />
-                <input type="text" placeholder="write a comment" />
-                <button>Send</button>
+                <input type="text" placeholder="write a comment" onChange={(e)=> setDesc(e.target.value)}/>
+                <button onClick={handleClick}>Send</button>
             </div>
-            {comments.map(comment => (
+            {isLoading ? "loading" : data.map(comment => (
                 <div className="comment" key={comment.id}>
                     <img src={comment.profilePic} alt="" />
                     <div className="info">
                         <span>{comment.name}</span>
                         <p>{comment.desc}</p>
                     </div>
-                    <span className="date">1 hour ago</span>
+                    <span className="date">{moment(comment.createdAt).fromNow()}</span>
                 </div>
             ))}
         </div>
