@@ -9,55 +9,83 @@ import PlaceIcon from "@mui/icons-material/Place";
 import LanguageIcon from "@mui/icons-material/Language";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+import { useQuery } from "react-query";
+import { makeRequest } from "../../axios";
+import { useLocation } from "react-router-dom";
+import { useContext } from "react";
+import { AuthContext } from "../../context/authContext";
 const Profile = () => {
+  const { currentUser } = useContext(AuthContext);
+
+  const userId = parseInt(useLocation().pathname.split("/")[2]);
+
+
+  const { isLoading, error, data } = useQuery(["user", userId], () =>
+    makeRequest.get('/users/find/' + userId).then((res) => {
+      return res.data;
+    })
+  );
+  console.log(data);
   return (
     <div className="profile">
-      <div className="images">
-        <img className="cover" src="https://images.pexels.com/photos/13440765/pexels-photo-13440765.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" alt="" />
-        <img className="profile" src="https://images.pexels.com/photos/14028501/pexels-photo-14028501.jpeg?auto=compress&cs=tinysrgb&w=1600&lazy=load" alt="" />
-      </div>
-      <div className="profileContainer">
-        <div className="uInfo">
-          <div className="left">
-            <a href="http://facebook.com">
-              <FacebookTwoToneIcon fontSize="large" />
-            </a>
-            <a href="http://facebook.com">
-              <InstagramIcon fontSize="large" />
-            </a>
-            <a href="http://facebook.com">
-              <TwitterIcon fontSize="large" />
-            </a>
-            <a href="http://facebook.com">
-              <LinkedInIcon fontSize="large" />
-            </a>
-            <a href="http://facebook.com">
-              <PinterestIcon fontSize="large" />
-            </a>
-          </div>
-          <div className="center">
-            <span>John Doe</span>
-            <div className="info">
-              <div className="item">
-                <PlaceIcon />
-                <span>USA</span>
-              </div>
-              <div className="item">
-                <LanguageIcon />
-                <span>lama.dev</span>
-              </div>
+      {isLoading ? (
+        "loading"
+      ) :
+        (
+          <>
+            <div className="images">
+              <img className="cover" src={data.coverPic} alt="" />
+              <img className="profile" src={data.profilePic} alt="" />
             </div>
-            <button>
-              follow
-            </button>
-          </div>
-          <div className="right">
-            <EmailOutlinedIcon />
-            <MoreVertIcon />
-          </div>
-        </div>
-        <Posts />
-      </div>
+            <div className="profileContainer">
+              <div className="uInfo">
+                <div className="left">
+                  <a href="http://facebook.com">
+                    <FacebookTwoToneIcon fontSize="large" />
+                  </a>
+                  <a href="http://facebook.com">
+                    <InstagramIcon fontSize="large" />
+                  </a>
+                  <a href="http://facebook.com">
+                    <TwitterIcon fontSize="large" />
+                  </a>
+                  <a href="http://facebook.com">
+                    <LinkedInIcon fontSize="large" />
+                  </a>
+                  <a href="http://facebook.com">
+                    <PinterestIcon fontSize="large" />
+                  </a>
+                </div>
+                <div className="center">
+                  <span>{data.name}</span>
+                  <div className="info">
+                    <div className="item">
+                      <PlaceIcon />
+                      <span>{data.city}</span>
+                    </div>
+                    <div className="item">
+                      <LanguageIcon />
+                      <span>{data.website}</span>
+                    </div>
+                  </div>
+                  {userId === currentUser.id ? (
+                  <button>update</button>
+                  ) : (
+                  <button>
+                    follow
+                  </button>
+                  )}
+
+                </div>
+                <div className="right">
+                  <EmailOutlinedIcon />
+                  <MoreVertIcon />
+                </div>
+              </div>
+              <Posts />
+            </div>
+          </>
+        )}
     </div>
   )
 }
